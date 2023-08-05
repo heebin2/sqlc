@@ -19,6 +19,7 @@ import (
 
 	"github.com/sqlc-dev/sqlc/internal/config"
 	"github.com/sqlc-dev/sqlc/internal/debug"
+	"github.com/sqlc-dev/sqlc/internal/genyaml"
 	"github.com/sqlc-dev/sqlc/internal/info"
 	"github.com/sqlc-dev/sqlc/internal/opts"
 	"github.com/sqlc-dev/sqlc/internal/tracer"
@@ -45,7 +46,12 @@ func Do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int 
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(uploadCmd)
+	rootCmd.AddCommand(genyamlCmd)
 	rootCmd.AddCommand(NewCmdVet())
+
+	genyamlCmd.AddCommand(genyamlPostgresCmd)
+	genyamlCmd.AddCommand(genyamlMysqlCmd)
+	genyamlCmd.AddCommand(genyamlSQLiteCmd)
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetIn(stdin)
@@ -234,6 +240,59 @@ var checkCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		return nil
+	},
+}
+
+var genyamlPostgresCmd = &cobra.Command{
+	Use:   "postgres",
+	Short: "Generate YAML from PostgreSQL",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		defer trace.StartRegion(cmd.Context(), "genyaml").End()
+		stderr := cmd.ErrOrStderr()
+		dir, name := getConfigPath(stderr, cmd.Flag("file"))
+		if err := genyaml.GenerateYAML(stderr, dir, name, "postgres"); err != nil {
+			os.Exit(1)
+		}
+
+		return nil
+	},
+}
+
+var genyamlMysqlCmd = &cobra.Command{
+	Use:   "mysql",
+	Short: "Generate YAML from Mysql",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		defer trace.StartRegion(cmd.Context(), "genyaml").End()
+		stderr := cmd.ErrOrStderr()
+		dir, name := getConfigPath(stderr, cmd.Flag("file"))
+		if err := genyaml.GenerateYAML(stderr, dir, name, "mysql"); err != nil {
+			os.Exit(1)
+		}
+
+		return nil
+	},
+}
+
+var genyamlSQLiteCmd = &cobra.Command{
+	Use:   "sqlite",
+	Short: "Generate YAML from SQLite",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		defer trace.StartRegion(cmd.Context(), "genyaml").End()
+		stderr := cmd.ErrOrStderr()
+		dir, name := getConfigPath(stderr, cmd.Flag("file"))
+		if err := genyaml.GenerateYAML(stderr, dir, name, "sqlite"); err != nil {
+			os.Exit(1)
+		}
+
+		return nil
+	},
+}
+
+var genyamlCmd = &cobra.Command{
+	Use:   "genyaml",
+	Short: "Generate YAML from SQL",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return errors.New("generate yaml requires engine name")
 	},
 }
 
