@@ -114,11 +114,10 @@ func makeConfig(engien, schemaFile string, queries []string) (Config, error) {
 			Queries: config.Paths{query},
 			Gen: SQLGen{
 				Go: &SQLGo{
-					Out:                 filepath.Join("internal", query),
+					Out:                 filepath.Join("internal", strings.TrimSuffix(query, filepath.Ext(query))),
 					EmitInterface:       true,
 					EmitExportedQueries: true,
 					EmitJSONTags:        true,
-					EmitExactTableNames: true,
 				},
 			},
 		}

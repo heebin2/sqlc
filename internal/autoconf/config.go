@@ -5,7 +5,6 @@ import "github.com/sqlc-dev/sqlc/internal/config"
 type SQLGo struct {
 	EmitInterface       bool   `json:"emit_interface" yaml:"emit_interface"`
 	EmitJSONTags        bool   `json:"emit_json_tags" yaml:"emit_json_tags"`
-	EmitExactTableNames bool   `json:"emit_exact_table_names,omitempty" yaml:"emit_exact_table_names"`
 	EmitExportedQueries bool   `json:"emit_exported_queries" yaml:"emit_exported_queries"`
 	Out                 string `json:"out" yaml:"out"`
 }

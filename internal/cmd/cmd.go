@@ -49,7 +49,7 @@ func Do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int 
 	rootCmd.AddCommand(autoconfCmd)
 	rootCmd.AddCommand(NewCmdVet())
 
-	autoconfCmd.AddCommand(autoconfDBCmd("postgres"))
+	autoconfCmd.AddCommand(autoconfDBCmd("postgresql"))
 	autoconfCmd.AddCommand(autoconfDBCmd("mysql"))
 	autoconfCmd.AddCommand(autoconfDBCmd("sqlite"))
 
