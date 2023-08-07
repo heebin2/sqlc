@@ -17,9 +17,9 @@ import (
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 
+	"github.com/sqlc-dev/sqlc/internal/autoconf"
 	"github.com/sqlc-dev/sqlc/internal/config"
 	"github.com/sqlc-dev/sqlc/internal/debug"
-	"github.com/sqlc-dev/sqlc/internal/genyaml"
 	"github.com/sqlc-dev/sqlc/internal/info"
 	"github.com/sqlc-dev/sqlc/internal/opts"
 	"github.com/sqlc-dev/sqlc/internal/tracer"
@@ -46,12 +46,12 @@ func Do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int 
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(uploadCmd)
-	rootCmd.AddCommand(genyamlCmd)
+	rootCmd.AddCommand(autoconfCmd)
 	rootCmd.AddCommand(NewCmdVet())
 
-	genyamlCmd.AddCommand(genyamlPostgresCmd)
-	genyamlCmd.AddCommand(genyamlMysqlCmd)
-	genyamlCmd.AddCommand(genyamlSQLiteCmd)
+	autoconfCmd.AddCommand(autoconfDBCmd("postgres"))
+	autoconfCmd.AddCommand(autoconfDBCmd("mysql"))
+	autoconfCmd.AddCommand(autoconfDBCmd("sqlite"))
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetIn(stdin)
@@ -243,54 +243,26 @@ var checkCmd = &cobra.Command{
 	},
 }
 
-var genyamlPostgresCmd = &cobra.Command{
-	Use:   "postgres",
-	Short: "Generate YAML from PostgreSQL",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		defer trace.StartRegion(cmd.Context(), "genyaml").End()
-		stderr := cmd.ErrOrStderr()
-		dir, name := getConfigPath(stderr, cmd.Flag("file"))
-		if err := genyaml.GenerateYAML(stderr, dir, name, "postgres"); err != nil {
-			os.Exit(1)
-		}
+func autoconfDBCmd(engine string) *cobra.Command {
+	return &cobra.Command{
+		Use:   engine,
+		Short: fmt.Sprintf("Automatically generate configure from %s", engine),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			defer trace.StartRegion(cmd.Context(), "autoconf").End()
+			stderr := cmd.ErrOrStderr()
+			dir, filename := getConfigPath(stderr, cmd.Flag("file"))
+			if err := autoconf.GenerateConfig(stderr, dir, filename, engine); err != nil {
+				os.Exit(1)
+			}
 
-		return nil
-	},
+			return nil
+		},
+	}
 }
 
-var genyamlMysqlCmd = &cobra.Command{
-	Use:   "mysql",
-	Short: "Generate YAML from Mysql",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		defer trace.StartRegion(cmd.Context(), "genyaml").End()
-		stderr := cmd.ErrOrStderr()
-		dir, name := getConfigPath(stderr, cmd.Flag("file"))
-		if err := genyaml.GenerateYAML(stderr, dir, name, "mysql"); err != nil {
-			os.Exit(1)
-		}
-
-		return nil
-	},
-}
-
-var genyamlSQLiteCmd = &cobra.Command{
-	Use:   "sqlite",
-	Short: "Generate YAML from SQLite",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		defer trace.StartRegion(cmd.Context(), "genyaml").End()
-		stderr := cmd.ErrOrStderr()
-		dir, name := getConfigPath(stderr, cmd.Flag("file"))
-		if err := genyaml.GenerateYAML(stderr, dir, name, "sqlite"); err != nil {
-			os.Exit(1)
-		}
-
-		return nil
-	},
-}
-
-var genyamlCmd = &cobra.Command{
-	Use:   "genyaml",
-	Short: "Generate YAML from SQL",
+var autoconfCmd = &cobra.Command{
+	Use:   "autoconf",
+	Short: "Automatically generate configure from SQL",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return errors.New("generate yaml requires engine name")
 	},

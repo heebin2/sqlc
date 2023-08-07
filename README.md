@@ -40,3 +40,12 @@ Sponsors receive priority support via the sqlc Slack organization.
 
 sqlc was inspired by [PugSQL](https://pugsql.org/) and
 [HugSQL](https://www.hugsql.org/).
+
+## Autoconf
+
+generate configure file 
+Defaults to yaml, which can be changed with the file option.
+
+```sh
+    sqlc autoconf mysql 
+```

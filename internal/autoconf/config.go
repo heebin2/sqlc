@@ -1,0 +1,27 @@
+package autoconf
+
+import "github.com/sqlc-dev/sqlc/internal/config"
+
+type SQLGo struct {
+	EmitInterface       bool   `json:"emit_interface" yaml:"emit_interface"`
+	EmitJSONTags        bool   `json:"emit_json_tags" yaml:"emit_json_tags"`
+	EmitExactTableNames bool   `json:"emit_exact_table_names,omitempty" yaml:"emit_exact_table_names"`
+	EmitExportedQueries bool   `json:"emit_exported_queries" yaml:"emit_exported_queries"`
+	Out                 string `json:"out" yaml:"out"`
+}
+
+type SQLGen struct {
+	Go *SQLGo `json:"go,omitempty" yaml:"go"`
+}
+
+type SQL struct {
+	Engine  config.Engine `json:"engine,omitempty" yaml:"engine"`
+	Schema  config.Paths  `json:"schema" yaml:"schema"`
+	Queries config.Paths  `json:"queries" yaml:"queries"`
+	Gen     SQLGen        `json:"gen" yaml:"gen"`
+}
+
+type Config struct {
+	Version string `json:"version" yaml:"version"`
+	SQL     []SQL  `json:"sql" yaml:"sql"`
+}
