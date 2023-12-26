@@ -13,7 +13,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const dbDir = "db"
+const (
+	internalDir = "internal"
+	dbDir       = "db"
+)
 
 func GenerateConfig(stderr io.Writer, dir, filename, engine string) error {
 	configFile := readConfigFileName(dir, filename)
@@ -108,13 +111,15 @@ func makeConfig(engien, schemaFile string, queries []string) (Config, error) {
 	}
 
 	for _, query := range queries {
+		parentDir := filepath.Base(filepath.Dir(query))
 		sql := SQL{
 			Engine:  config.Engine(engien),
 			Schema:  config.Paths{schemaFile},
 			Queries: config.Paths{query},
 			Gen: SQLGen{
 				Go: &SQLGo{
-					Out:                 filepath.Join("internal", strings.TrimSuffix(query, filepath.Ext(query))),
+					PackageName:         parentDir,
+					Out:                 filepath.Join(internalDir, dbDir, parentDir),
 					EmitInterface:       true,
 					EmitExportedQueries: true,
 					EmitJSONTags:        true,
