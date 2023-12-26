@@ -118,11 +118,12 @@ func makeConfig(engien, schemaFile string, queries []string) (Config, error) {
 			Queries: config.Paths{query},
 			Gen: SQLGen{
 				Go: &SQLGo{
-					PackageName:         parentDir,
-					Out:                 filepath.Join(internalDir, dbDir, parentDir),
-					EmitInterface:       true,
-					EmitExportedQueries: true,
-					EmitJSONTags:        true,
+					PackageName:               parentDir,
+					Out:                       filepath.Join(internalDir, dbDir, parentDir),
+					EmitInterface:             true,
+					EmitExportedQueries:       true,
+					EmitJSONTags:              true,
+					EmitMethodsWithDbArgument: true,
 				},
 			},
 		}
